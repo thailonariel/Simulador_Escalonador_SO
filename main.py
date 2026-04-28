@@ -69,3 +69,41 @@ def simular_sjf_np(repositorio, ttc):
             escalonador.tempo_atual += 1
 
     return resultado
+
+def simular_sjf_p(repositorio, ttc):
+    escalonador = SimulacaoEscalonador(ttc)
+    resultado = ResultadoSimulacao()
+    todos_processos = repositorio.listar()
+    p_atual = None
+
+    #Simulamos segundo a segundo
+    while len(escalonador.processos_finalizados) < len(todos_processos):
+        # 1. Verifica quem chegou agora
+        for p in todos_processos:
+            if p.tempo_chegada == escalonador.tempo_atual:
+                escalonador.fila_prontos.adicionar(p)
+
+        # 2. Ordena a fila pelo tempo restante (Shortest Remaining Time First)
+        escalonador.fila_prontos.ordenar(lambda p: p.tempo_restante)
+
+        if not escalonador.fila_prontos.estavazia():
+            p_topo = escalonador.fila_prontos.processos[0] #Só espia o primeiro da fila
+
+            # Lógica de preempção: Se o novo é menor que o que está rodando
+            if p_atual is None or p_topo.tempo_restante < p_atual.tempo_restante:
+                if p_atual is not None:
+                    escalonador.fila_prontos.adicionar(p_atual) # Devolve atual para a fila
+                    escalonador.trocar_contexto() # Troca de contexto por interrupção
+
+                p_atual = escalonador.fila_prontos.remover()
+
+            # 3. Executa apenas 1 ciclo
+            terminou = escalonador.executar_ciclo(p_atual)
+            resultado.registrar_execucao(p_atual.id)
+
+            if terminou:
+                resultado.registrar_tempo(p_atual)
+                p_atual = None # Libera a CPU para o próximo segundo
+        else:
+            escalonador.tempo_atual += 1
+    return resultado
