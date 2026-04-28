@@ -30,7 +30,7 @@ def simular_fcfs(repositorio, ttc):
             #3. Executa o processo até terminar
             while p_atual.tempo_restante > 0:
                 terminou = escalonador.executar_ciclo(p_atual)
-                resultado.registrar_execução(p_atual.id)
+                resultado.registrar_execucao(p_atual.id)
 
             #Ao terminar, registra os tempos finais
             resultado.registrar_tempo(p_atual)
@@ -63,7 +63,7 @@ def simular_sjf_np(repositorio, ttc):
 
             while p_atual.tempo_atual > 0:
                 escalonador.executar_ciclo(p_atual)
-                resultado.registrar_execução(p_atual.id)
+                resultado.registrar_execucao(p_atual.id)
 
             resultado.registrar_tempo(p_atual)
         else:
@@ -186,4 +186,8 @@ if __name__ == "__main__":
     # 3. Exibimos os resultados
     print("\n--- RESULTADO FINAL ---")
     print(f"Ordem de Execução: {res.ordem_execucao}")
-    print(f"Tempos Efetivos: {res.tempos_execucao}")
+    
+    for pid in res.tempos_execucao:
+        print(f"PID {pid}: Tempo Efetivo = {res.tempos_execucao[pid]}s | Espera = {res.tempos_espera[pid]}s")
+    
+    print(f"\nTEMPO MÉDIO DE ESPERA: {res.calcular_media_espera():.2f}s")
