@@ -1,3 +1,4 @@
+from processo import Processo
 from repositorio import RepositorioProcessos
 from escalonador import SimulacaoEscalonador
 from resultado import ResultadoSimulacao
@@ -149,3 +150,40 @@ def simular_round_robin(repositorio, ttc, quantum):
             escalonador.tempo_atual += 1
 
     return resultado
+
+if __name__ == "__main__":
+    # 1. Primeiro chamamos a função para cadastrar os dados
+    repo = RepositorioProcessos()
+
+    print("___ CADASTRO DE PROCESSOS ___ ")
+    qtd = int(input("Quantos processos?    "))
+    for i in range(qtd):
+        pid = int(input(f"PID do processo {i+1}: "))
+        chegada = int(input("Tempo de chegada: "))
+        execucao = int(input("Tempo de execução: "))
+        repo.adicionar(Processo(pid, chegada, execucao))
+
+    # 2. Depois exibimos o menu de algoritmos
+    print("\n--- ESCOLHA O ALGORITMO ---")
+    print("1. FCFS")
+    print("2. SJF (Não Preemptivo)")
+    print("3. SJF (Preemptivo)")
+    print("4. Round Robin")
+    opcao = int(input("Opção: "))
+    
+    ttc = int(input("Tempo de Troca de Contexto (TTC): "))
+    
+    if opcao == 1:
+        res = simular_fcfs(repo, ttc)
+    elif opcao == 2:
+        res = simular_sjf_np(repo, ttc)
+    elif opcao == 3:
+        res = simular_sjf_p(repo, ttc)
+    elif opcao == 4:
+        q = int(input("Valor do Quantum: "))
+        res = simular_round_robin(repo, ttc, q)
+
+    # 3. Exibimos os resultados
+    print("\n--- RESULTADO FINAL ---")
+    print(f"Ordem de Execução: {res.ordem_execucao}")
+    print(f"Tempos Efetivos: {res.tempos_execucao}")
