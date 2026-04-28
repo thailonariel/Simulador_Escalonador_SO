@@ -12,3 +12,11 @@ class ResultadoSimulacao:
         # Tempo efetivo observado na simulação 
         tempo_efetivo = processo.tempo_fim - processo.tempo_chegada
         self.tempos_execucao[processo.id] = tempo_efetivo
+
+    def calcular_tempo_medio_espera(self):
+        soma_espera = 0
+        for pid, tempo_efetivo in self.tempos_execucao.itens():
+            # Pegamos o processo original
+            # Ou calcular durante a execução
+            pass
+        # O objetivo é chegar n valor médio exigido
