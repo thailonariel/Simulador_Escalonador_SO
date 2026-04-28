@@ -129,7 +129,7 @@ def simular_round_robin(repositorio, ttc, quantum):
 
             # Executa até terminarou até atingir o quantum
             tempo_no_quantum = 0
-            while tempo_no_quantum < quantum and p_aual.tempo_restante > 0:
+            while tempo_no_quantum < quantum and p_atual.tempo_restante > 0:
                 terminou = escalonador.executar_ciclo(p.atual)
                 resultado.registrar_execucao(p_atual.id)
                 tempo_no_quantum += 1
