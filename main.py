@@ -47,24 +47,21 @@ def simular_sjf_np(repositorio, ttc):
     todos_processos = repositorio.listar()
 
     while len(escalonador.processos_finalizados) < len(todos_processos):
-        # 1. Adiciona quem chegou no tempo atual
-        for p in todos_processos:
-            if p.tempo_chegada == escalonador.tempo_atual:
-                escalonador.fila_prontos.adicionar(p)
-
+        # ... lógica de adicionar processos ...
+        
         if not escalonador.fila_prontos.estavazia():
-            # Antes de remover, ordenamos pelo menor tempo de execução
+            # Ordena pelo menor tempo de execução
             escalonador.fila_prontos.ordenar(lambda p: p.tempo_execucao)
-
             p_atual = escalonador.fila_prontos.remover()
-
-            if escalonador.tempo_atual > 0 and len(escalonador.ordem_execucao) > 0:
+            
+            if escalonador.tempo_atual > 0:
                 escalonador.trocar_contexto()
 
-            while p_atual.tempo_atual > 0:
+            # O correto é p_atual.tempo_restante
+            while p_atual.tempo_restante > 0:
                 escalonador.executar_ciclo(p_atual)
                 resultado.registrar_execucao(p_atual.id)
-
+            
             resultado.registrar_tempo(p_atual)
         else:
             escalonador.tempo_atual += 1
@@ -113,38 +110,35 @@ def simular_round_robin(repositorio, ttc, quantum):
     escalonador = SimulacaoEscalonador(ttc)
     resultado = ResultadoSimulacao()
     todos_processos = repositorio.listar()
-
-    #O round robin usa a fila estritamente por ordem de chegada
+    
     while len(escalonador.processos_finalizados) < len(todos_processos):
-        # 1. Adiciona quem chegou no tempo_atual
+        # 1. Checa quem chegou no tempo atual
         for p in todos_processos:
-            if p.tempo_chegada == escalonador.tempo_atual:
+            if p.tempo_chegada == escalonador.tempo_atual and p not in escalonador.fila_prontos.processos and p not in escalonador.processos_finalizados:
                 escalonador.fila_prontos.adicionar(p)
-
+        
         if not escalonador.fila_prontos.estavazia():
             p_atual = escalonador.fila_prontos.remover()
-
-            # Troca de contexto se não for o primeiroprocesso
-            if escalonador.tempo_atual > 0 and len(escalonador.ordem_execucao) > 0:
+            
+            if escalonador.tempo_atual > 0:
                 escalonador.trocar_contexto()
 
-            # Executa até terminarou até atingir o quantum
             tempo_no_quantum = 0
+            # Executa até o fim do processo OU até acabar o quantum
             while tempo_no_quantum < quantum and p_atual.tempo_restante > 0:
-                terminou = escalonador.executar_ciclo(p.atual)
+                escalonador.executar_ciclo(p_atual)
                 resultado.registrar_execucao(p_atual.id)
                 tempo_no_quantum += 1
-
-                #No meio do quantum, novos processos podem chegar
-                for p in todos_processos:
-                    if p.tempo_chegada == escalonador.tempo_atual:
-                        escalonador.fila_prontos.adicionar(p)
+                
+                # IMPORTANTE: Checar novas chegadas a cada segundo do quantum
+                for p_novo in todos_processos:
+                    if p_novo.tempo_chegada == escalonador.tempo_atual and p_novo not in escalonador.fila_prontos.processos and p_novo not in escalonador.processos_finalizados and p_novo != p_atual:
+                        escalonador.fila_prontos.adicionar(p_novo)
 
             if p_atual.tempo_restante > 0:
-                #Não terminou, volta para o final da fila
+                # Se não terminou, volta para o FIM da fila
                 escalonador.fila_prontos.adicionar(p_atual)
             else:
-                #Terminou, registra o tempo
                 resultado.registrar_tempo(p_atual)
         else:
             escalonador.tempo_atual += 1
@@ -191,3 +185,7 @@ if __name__ == "__main__":
         print(f"PID {pid}: Tempo Efetivo = {res.tempos_execucao[pid]}s | Espera = {res.tempos_espera[pid]}s")
     
     print(f"\nTEMPO MÉDIO DE ESPERA: {res.calcular_media_espera():.2f}s")
+    
+    soma_turnaround = sum(res.tempos_execucao.values())
+    media_turnaround = soma_turnaround / len(res.tempos_execucao)
+    print(f"TEMPO MÉDIO DE TURNAROUND: {media_turnaround:.2f}s")
