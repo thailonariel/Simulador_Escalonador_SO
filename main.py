@@ -47,7 +47,10 @@ def simular_sjf_np(repositorio, ttc):
     todos_processos = repositorio.listar()
 
     while len(escalonador.processos_finalizados) < len(todos_processos):
-        # ... lógica de adicionar processos ...
+        # 1. Checa quem chegou no tempo atual
+        for p in todos_processos:
+            if p.tempo_chegada <= escalonador.tempo_atual and p not in escalonador.fila_prontos.processos and p not in escalonador.processos_finalizados:
+                escalonador.fila_prontos.adicionar(p)
         
         if not escalonador.fila_prontos.estavazia():
             # Ordena pelo menor tempo de execução
@@ -78,7 +81,7 @@ def simular_sjf_p(repositorio, ttc):
     while len(escalonador.processos_finalizados) < len(todos_processos):
         # 1. Verifica quem chegou agora
         for p in todos_processos:
-            if p.tempo_chegada == escalonador.tempo_atual:
+            if p.tempo_chegada <= escalonador.tempo_atual and p not in escalonador.fila_prontos.processos and p not in escalonador.processos_finalizados:
                 escalonador.fila_prontos.adicionar(p)
 
         # 2. Ordena a fila pelo tempo restante (Shortest Remaining Time First)
@@ -114,7 +117,7 @@ def simular_round_robin(repositorio, ttc, quantum):
     while len(escalonador.processos_finalizados) < len(todos_processos):
         # 1. Checa quem chegou no tempo atual
         for p in todos_processos:
-            if p.tempo_chegada == escalonador.tempo_atual and p not in escalonador.fila_prontos.processos and p not in escalonador.processos_finalizados:
+            if p.tempo_chegada <= escalonador.tempo_atual and p not in escalonador.fila_prontos.processos and p not in escalonador.processos_finalizados:
                 escalonador.fila_prontos.adicionar(p)
         
         if not escalonador.fila_prontos.estavazia():
