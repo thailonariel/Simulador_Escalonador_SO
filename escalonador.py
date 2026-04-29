@@ -8,6 +8,10 @@ class SimulacaoEscalonador:
         self.processos_finalizados = []
         self.ordem_execucao = []  # Para registrar a ordem de execução dos processos
 
+    def trocar_contexto(self):
+        # Simula o tempo gasto para trocar de processo
+        self.tempo_atual += self.tempo_troca_contexto
+
     def executar_ciclo(self, processo):
         # Simula a CPU rodando por uma unidade de tempo
         if processo.tempo_inicio == -1:

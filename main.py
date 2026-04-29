@@ -16,7 +16,7 @@ def simular_fcfs(repositorio, ttc):
 
         #1, Adiciona quem chegou na fila de prontos
         for p in todos_processos:
-            if p.tempo_chegada == escalonador.tempo_atual:
+            if p.tempo_chegada <= escalonador.tempo_atual and p not in escalonador.fila_prontos.processos and p not in escalonador.processos_finalizados:
                 escalonador.fila_prontos.adicionar(p)
 
         #2. Se a fila não estiver vazia, pegamos o próximos (FCFS)
